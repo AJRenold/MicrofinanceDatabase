@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en-us">
+	<head>
+		<meta charset="utf-8">
+		<title>Microfinance Database Project</title>
+		<link rel="stylesheet" href="/microfinance/static/css/bootstrap.css">
+		<link type="text/css" rel="stylesheet" href="http://jqueryui.com/themes/base/jquery.ui.all.css">
+		<!-- <link rel="stylesheet" href="static/css/styles.css"> -->
+		<script src="http://code.jquery.com/jquery-latest.js"></script>
+		
+		<script type="text/javascript" src="/microfinance/static/bootstrap.js"></script>
+		<script type="text/javascript" src="/microfinance/static/script.js"></script>
+		<link type="text/css" rel="stylesheet" href="/microfinance/static/css/graph.css">
+		<link type="text/css" rel="stylesheet" href="/microfinance/static/css/detail.css">
+		<link type="text/css" rel="stylesheet" href="/microfinance/static/css/legend.css">
+		<link type="text/css" rel="stylesheet" href="/microfinance/static/css/lines.css">
+		
+		<script src="/microfinance/static/rickshaw.js"></script>
+		<script src="/microfinance/static/date.js"></script>
+		<script src="/microfinance/static/d3.v2.js"></script>
+	
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
+		<script src="/microfinance/static/autoNumeric-1.7.5.js" type=text/javascript></SCRIPT>
+		<script src="/microfinance/static/Rickshaw.Graph.RangeSlider.js"></script>
+
+	</head>
+	<body>
+	
+		<div class="navbar">
+  			<div class="navbar-inner">
+    			<a class="brand" href="/microfinance">Microfinance Reports</a>
+    		<ul class="nav nav-tabs" id="tabs">
+      			<li><a href="#importDataTab">Import Data</a></li>
+      			<li><a href="#organizationPerformanceTab">Organization Performance</a></li>
+      			<li><a href="#branchPerformanceTab">Branch Performance</a></li>
+      			<li><a href="#loPerformanceTab">Loan Officer Performance</a></li>
+    		</ul>
+  			</div>
+		</div>
+		
+		<div class="container" style="padding-top: 30px">
+			
+			<div class="tab-pane" id="importDataTab">			
+				
+				<form action="/microfinance/fileupload" method="post" enctype="multipart/form-data">
+      					<label><h3>Report File Upload</h3></label>
+      					<input type="file" name="file"><p></p>
+      					<label><h3>Report Generation Date</h3></label> 
+						<input type="date" name="report_date" id="report_date">
+         				<input type="submit" value="Upload">
+				</form>	
+				
+				<form id="deleteFilesForm">
+					<h3>Delete Uploaded Files from DB</h3>
+					<table class="table table-hover">
+						<thead>
+							<tr>
+							<th>File</th>
+							<th>Select to Delete</th>
+							</tr>
+						<thead>
+						<tbody id="deleteFilesFormTable">
+						</tbody>	
+					</table>
+					<input type="submit" value="Delete">
+				</form>
+	
+			</div>	
+			<div class="tab-pane" id="organizationPerformanceTab" style="display: none">
+				<div id="chart_container">				
+					<div id="chart" class="rickshaw_graph"></div>
+					<div id="legend_container">
+					<div id="smoother" title="Smoothing"></div>
+					<div id="org_legend"></div>
+					<div id="org_slider"></div></div>
+				</div>
+				<div id="table">
+					<table class="table table-hover" style="font-size: 11px">
+  						<caption></caption>
+ 						<thead>
+ 	   						<tr id="orgPerformanceTableHeader">
+							<th>Metric</th>		
+							</tr>
+  						</thead>
+  						<tbody id="orgPerformanceTableBody">
+							<tr id="orgClients"><td>Loan Clients</td></tr>
+							<tr id="orgPortfolio"><td>Portfolio</td></tr>
+							<tr id="orgPortfolio1"><td>Portfolio &#062; 1 Day</td></tr>
+							<tr id="orgPortfolio30"><td>Portfolio &#062; Days</td></tr>
+  						</tbody>
+					</table>
+				
+				</div>
+			</div>
+			<div class="tab-pane" id="branchPerformanceTab" style="display: none">
+				<div class="row">
+				 <form>
+				 	<label><h3>Select Metric</h3></label>
+				 	<select id="branchMetric" name="metric">
+                                                <option value="loanClients">Clients</option>
+                                                <option value="principalBalance">Portfolio</option>
+                                                <option value="principal1Day">Portfolio &#062; 1 day</option>
+                                                <option value="Principal30Day">Portfolio &#062; 30 days</option>
+                                        </select>
+                                </form>
+
+				<div id="chart_container">
+                                        <div id="branch_chart" class="rickshaw_graph"></div>
+                                        <div id="legend_container">
+                                        <div id="smoother" title="Smoothing"></div>
+                                        <div id="branch_legend"></div></div>
+                                </div>
+                                        <div id="branch_slider">
+                                        </div>
+				</div>
+				<div class="row" style="padding-top: 20px">
+					<form action="/microfinance/BranchDataFile" method="get">
+                                        	<input type="submit" id="download" value="Download Graph Data">
+                                	</form>
+				</div>
+			</div>
+			<div class="tab-pane" id="loPerformanceTab" style="display: none">
+				<form>
+					<label><h3>Select Branch</h3></label>
+					<select id="loBranch" name="branch">
+						<option value="10">Head Office</option>
+                                                <option value="11">Arusha</option>
+                                                <option value="12">Dar es Salaam</option>
+                                                <option value="13">Moshi</option>
+                                                <option value="14">Tengeru</option>
+                                                <option value="15">Himo</option>
+					</select>
+				</form>
+				<form>
+                                        <label><h3>Select Metric</h3></label>
+                                        <select id="loMetric" name="metric">
+                                                <option value="loanClients">Clients</option>
+                                                <option value="principalBalance">Portfolio</option>
+                                                <option value="principal1Day">Portfolio &#062; 1 day</option>
+                                                <option value="Principal30Day">Portfolio &#062; 30 days</option>
+                                        </select>
+                                </form>
+
+                                <div id="chart_container">
+                                        <div id="lo_chart" class="rickshaw_graph"></div>
+                                        <div id="legend_container">
+                                        <div id="smoother" title="Smoothing"></div>
+                                        <div id="lo_legend" style="margin-left: 10px"></div></div>
+                                </div>
+                                        <div id="lo_slider">
+                                        </div>
+			</div>
+		</div>
+		
+	</body>
+</html>

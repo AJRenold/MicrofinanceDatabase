@@ -1,0 +1,135 @@
+<!doctype>
+<head>
+	<link type="text/css" rel="stylesheet" href="http://jqueryui.com/themes/base/jquery.ui.all.css">
+	<link type="text/css" rel="stylesheet" href="/microfinance/static/css/graph.css">
+	<link type="text/css" rel="stylesheet" href="/microfinance/static/css/detail.css">
+	<link type="text/css" rel="stylesheet" href="/microfinance/static/css/legend.css">
+	<link type="text/css" rel="stylesheet" href="/microfinance/static/css/lines.css">
+
+	<script src="/microfinance/static/d3.v2.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
+
+	<script src="/microfinance/static/rickshaw.js"></script>
+	<script src="/microfinance/static/date.js"></script>
+	
+</head>
+<body>
+
+<div id="chart_container">
+	<div id="chart"></div>
+	<div id="legend_container">
+		<div id="smoother" title="Smoothing"></div>
+		<div id="legend"></div>
+	</div>
+	<div id="slider"></div>
+</div>
+
+<script>
+
+// set up our data series with 50 random data points
+$.get('/microfinance/DashboardData', function(data) {
+ 	graph_now(data);
+//	for (var i=0;i<data.results.length;i++){
+//		console.log(data.results[i]['loanClients']);		
+//		console.log(data.results[i]);
+//	}
+//	console.log(data);
+	});
+
+
+function graph_now(data) {
+
+var seriesData = [[],[],[]];
+
+	for (var i=0;i<data.results.length;i++) {
+		seriesData[0].push( { x: 
+Date.parse(data.results[i]['ReportDate']).getTime()/1000, 
+y: parseFloat(data.results[i]['principalBalance']) } );
+ 		seriesData[1].push( { x: 
+Date.parse(data.results[i]['ReportDate']).getTime()/1000, y: 
+parseFloat(data.results[i]['principal1Day']) } );
+		seriesData[2].push( { x: 
+Date.parse(data.results[i]['ReportDate']).getTime()/1000, 
+y: parseFloat(data.results[i]['Principal30Day']) } );	
+		console.log(data.results[i]['ReportDate']);
+	}
+
+//console.log(seriesData);
+//console.log(typeof(seriesData[0][0]));
+//console.log(seriesData[1]);
+//console.log(seriesData[2]);
+
+
+//var seriesData = [ [], [], [] ];
+//var random = new Rickshaw.Fixtures.RandomData(150);
+
+// instantiate our graph!
+
+var graph = new Rickshaw.Graph( {
+	element: document.getElementById("chart"),
+	width: 960,
+	height: 500,
+	renderer: 'line',
+	series: [
+		{
+			color: "#c05020",
+			data: seriesData[0],
+			name: 'Principal Balance'
+		}, {
+			color: "#30c020",
+			data: seriesData[1],
+			name: 'Principal > 1 day'
+		}, {
+			color: "#6060c0",
+			data: seriesData[2],
+			name: 'Principal > 30 days'
+		}
+	]
+} );
+
+var x_axis = new Rickshaw.Graph.Axis.Time({
+	graph: graph
+});
+
+var y_axis = new Rickshaw.Graph.Axis.Y({
+	graph: graph,
+	tickFormat: Rickshaw.Fixtures.Number.formatKMBT,
+});
+
+graph.render();
+
+var hoverDetail = new Rickshaw.Graph.HoverDetail( {
+	graph: graph
+} );
+
+var legend = new Rickshaw.Graph.Legend( {
+	graph: graph,
+	element: document.getElementById('legend')
+
+} );
+
+var shelving = new Rickshaw.Graph.Behavior.Series.Toggle( {
+	graph: graph,
+	legend: legend
+} );
+
+var axes = new Rickshaw.Graph.Axis.Time( {
+	graph: graph
+} );
+
+//var time = new Rickshaw.Fixtures.Time();
+//var months = time.unit('months');
+
+//var xAxis = new Rickshaw.Graph.Axis.Time({
+  //  graph: graph,
+  //  timeUnit: months
+//});
+
+//axes.render();
+xAxis.render();
+}
+</script>
+
+</body>

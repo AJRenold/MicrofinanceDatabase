@@ -1,0 +1,77 @@
+<!doctype>
+<head>
+	<link type="text/css" rel="stylesheet" href="/microfinance/static/css/graph.css">
+	<link type="text/css" rel="stylesheet" href="/microfinance/static/css/detail.css">
+	<link type="text/css" rel="stylesheet" href="/microfinance/static/css/legend.css">
+	<link type="text/css" rel="stylesheet" href="/microfinance/static/css/lines.css">
+
+	<script src="/microfinance/static/d3.v2.js"></script>
+
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.15/jquery-ui.min.js"></script>
+
+	<script src="/microfinance/static/rickshaw.js"></script>
+	<!-- <link rel="stylesheet" href="https://github.com/shutterstock/rickshaw/blob/master/rickshaw.min.css">
+	<script src="../vendor/d3.layout.min.js"></script> -->
+
+</head>
+<body>
+
+<div id="chart"></div>
+
+<script>
+
+// set up our data series with 50 random data points
+$.get('/microfinance/DashboardData', function(data) {
+ 	graph_now(data);
+//	for (var i=0;i<data.results.length;i++){
+//		console.log(data.results[i]['loanClients']);		
+//		console.log(data.results[i]);
+//	}
+//	console.log(data);
+	});
+
+
+function graph_now(data) {
+
+var seriesData = [];
+
+	for (var i=0;i<data.results.length;i++) {
+		seriesData.push( { x: i , y: parseFloat(data.results[i]['principalBalance']) } );	
+	}
+
+console.log(seriesData);
+
+var graph = new Rickshaw.Graph( {
+        element: document.querySelector("#chart"),
+        width: 580,
+        height: 250,
+        series: [ {
+                color: 'steelblue',
+                data: seriesData
+        } ]
+} );
+
+var time = new Rickshaw.Fixtures.Time();
+var months = time.unit('month');
+
+var xAxis = new Rickshaw.Graph.Axis.Time({
+    graph: graph,
+    timeUnit: months
+});
+
+var yAxis = new Rickshaw.Graph.Axis.Y({
+    graph: graph
+});
+
+xAxis.render();
+
+yAxis.render();
+
+graph.render();
+
+}
+</script>
+
+
+</body>
